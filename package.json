@@ -1,0 +1,57 @@
+{
+  "name": "loopback-component-storage-postgres",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "pretest": "sh test/pretest.sh; echo",
+    "test": "COFFEECOV_INIT_ALL=false mocha 'test/{,**/}*.coffee'",
+    "posttest": "istanbul report",
+    "build": "gulp",
+    "watch": "gulp watch"
+  },
+  "keywords": [
+    "loopback",
+    "postgres",
+    "connector",
+    "storage"
+  ],
+  "author": "Jérémie Drouet <jeremie.drouet@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.5.2",
+    "bluebird": "^3.0.6",
+    "busboy": "^0.2.11",
+    "debug": "^2.2.0",
+    "formidable": "^1.0.17",
+    "lodash": "^3.10.1",
+    "loopback-connector": "^2.3.0",
+    "pg": "^4.4.3",
+    "pg-large-object": "^1.0.1",
+    "string_decoder": "^0.10.31"
+  },
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "codecov.io": "^0.1.6",
+    "coffee-coverage": "^0.6.3",
+    "coffee-script": "^1.10.0",
+    "compression": "^1.0.3",
+    "cors": "^2.5.2",
+    "gulp": "^3.9.0",
+    "gulp-coffee": "^2.3.1",
+    "gulp-mocha": "^2.1.3",
+    "gulp-plumber": "^1.0.1",
+    "gulp-util": "^3.0.6",
+    "istanbul": "^0.3.22",
+    "jshint": "^2.5.6",
+    "loopback": "^2.22.0",
+    "loopback-boot": "^2.6.5",
+    "loopback-component-explorer": "^2.1.0",
+    "loopback-datasource-juggler": "^2.39.0",
+    "mocha": "^2.3.3",
+    "mongodb": "^2.0.45",
+    "serve-favicon": "^2.0.1",
+    "superagent": "^1.4.0",
+    "supertest": "^1.1.0"
+  }
+}
