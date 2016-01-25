@@ -110,7 +110,7 @@ class PostgresStorage
         file.pipe stream
 
   getFiles: (container, callback) ->
-    @db.query "select * from #{@settings.table} where container = $1", [name], callback
+    @db.query "select * from #{@settings.table} where container = $1", [container], callback
   
   removeFile: (container, filename, callback) ->
     self = @
