@@ -171,6 +171,7 @@ describe 'postgres connector', ->
         request 'http://127.0.0.1:5000'
         .get '/my-model/my-cats/download/item.png'
         .end (err, res) ->
+          console.log res.body
           expect(res.status).to.equal 200
           done()
 
