@@ -1,9 +1,7 @@
 # loopback-component-storage-postgres
 [![Build Status](https://travis-ci.org/jdrouet/loopback-component-storage-postgres.svg)](https://travis-ci.org/jdrouet/loopback-component-storage-postgres)
-[![codecov.io](https://codecov.io/github/jdrouet/loopback-component-storage-postgres/coverage.svg?branch=master)](https://codecov.io/github/jdrouet/loopback-component-storage-postgres?branch=master)
 [![Dependency Status](https://david-dm.org/jdrouet/loopback-component-storage-postgres.svg)](https://david-dm.org/jdrouet/loopback-component-storage-postgres)
-
-![codecov.io](https://codecov.io/github/jdrouet/loopback-component-storage-postgres/branch.svg?branch=master)
+[![codecov.io](https://codecov.io/github/jdrouet/loopback-component-storage-postgres/coverage.svg?branch=master)](https://codecov.io/github/jdrouet/loopback-component-storage-postgres?branch=master)
 
 LoopBack storage postgres component provides Node.js and REST APIs to manage binary contents using Postgres Large Object
 
