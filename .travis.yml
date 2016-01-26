@@ -18,7 +18,7 @@ notifications:
     - jeremie.drouet@gmail.com
 
 before_script:
-  - PG_HOST=localhost PG_PORT=5432 sh prepare-db.sh
+  - PG_HOST=localhost PG_PORT=5432 sh test/pretest.sh
   - npm install
   - npm run build
 
