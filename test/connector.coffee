@@ -110,7 +110,7 @@ describe 'postgres connector', ->
       app.model model
       setTimeout done, 200
 
-    before (done) ->
+    beforeEach (done) ->
       ds.connector.db.query 'SELECT lo_unlink(l.oid) FROM pg_largeobject_metadata l', ->
         ds.connector.db.query 'DELETE FROM files WHERE true', done
 
@@ -135,7 +135,7 @@ describe 'postgres connector', ->
 
       describe 'with data', ->
 
-        before (done) ->
+        beforeEach (done) ->
           insertTestFile ds, done
 
         it 'should return an array', (done) ->
@@ -146,6 +146,64 @@ describe 'postgres connector', ->
             expect(Array.isArray res.body).to.equal true
             expect(res.body.length).to.equal 1
             expect(res.body[0].container).to.equal 'my-cats'
+            done()
+
+    describe 'getFiles', ->
+
+      describe 'without data', ->
+
+        it 'should return an array', (done) ->
+          request 'http://127.0.0.1:5000'
+          .get '/my-model/nothing'
+          .end (err, res) ->
+            expect(res.status).to.equal 200
+            expect(res.body.container).to.equal 'nothing'
+            expect(Array.isArray res.body.files).to.equal true
+            expect(res.body.files.length).to.equal 0
+            done()
+
+      describe 'with data', ->
+
+        beforeEach (done) ->
+          insertTestFile ds, done
+
+        it 'should return an array', (done) ->
+          app.models.MyModel.getFiles 'my-cats', (err, res) ->
+            expect(Array.isArray res.rows).to.equal true
+            expect(res.rows.length).to.equal 1
+            done()
+
+        it 'should return an array', (done) ->
+          request 'http://127.0.0.1:5000'
+          .get '/my-model/my-cats'
+          .end (err, res) ->
+            expect(res.status).to.equal 200
+            expect(res.body.container).to.equal 'my-cats'
+            expect(Array.isArray res.body.files).to.equal true
+            expect(res.body.files.length).to.equal 1
+            done()
+
+    describe 'destroyContainer', ->
+
+      describe 'without data', ->
+
+        it 'should return an array', (done) ->
+          request 'http://127.0.0.1:5000'
+          .delete '/my-model/no-container'
+          .end (err, res) ->
+            expect(res.status).to.equal 200
+            done()
+
+      describe 'with data', ->
+
+        beforeEach (done) ->
+          insertTestFile ds, done
+
+        it 'should return an array', (done) ->
+          request 'http://127.0.0.1:5000'
+          .delete '/my-model/my-cats'
+          .end (err, res) ->
+            expect(res.status).to.equal 200
             done()
 
     describe 'upload', ->
@@ -160,11 +218,7 @@ describe 'postgres connector', ->
 
     describe 'download', ->
    
-      before (done) ->
-        ds.connector.db.query 'SELECT lo_unlink(l.oid) FROM pg_largeobject_metadata l', ->
-          ds.connector.db.query 'DELETE FROM files WHERE true', done
-     
-      before (done) ->
+      beforeEach (done) ->
         insertTestFile ds, done
 
       it 'should return the file', (done) ->
@@ -174,3 +228,14 @@ describe 'postgres connector', ->
           expect(res.status).to.equal 200
           done()
 
+    describe 'removeFile', ->
+   
+      beforeEach (done) ->
+        insertTestFile ds, done
+
+      it 'should drop the file', (done) ->
+        request 'http://127.0.0.1:5000'
+        .delete '/my-model/my-cats/files/item.png'
+        .end (err, res) ->
+          expect(res.status).to.equal 200
+          done()

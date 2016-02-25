@@ -51,7 +51,7 @@ class PostgresStorage
       return callback err if err
       async.waterfall [
         (done) ->
-          sql = "select lo_unlink(objectid) from #{@settings.table} where container = $1"
+          sql = "select lo_unlink(objectid) from #{self.settings.table} where container = $1"
           self.db.query sql, [name], (err) ->
             done err
         (done) ->
@@ -114,16 +114,22 @@ class PostgresStorage
   
   removeFile: (container, filename, callback) ->
     self = @
+    self.getFile container, filename, (err, file) ->
+      return callback err if err
+      self.removeFileById file.id, callback
+
+  removeFileById: (id, callback) ->
+    self = @
     self.db.query 'BEGIN TRANSACTION', (err) ->
       return callback err if err
       async.waterfall [
         (done) ->
-          sql = "select lo_unlink(objectid) from #{self.settings.table} where container = $1 and filename = $2"
-          self.db.query sql, [container, filename], (err) ->
+          sql = "select lo_unlink(objectid) from #{self.settings.table} where id = $1"
+          self.db.query sql, [id], (err) ->
             done err
         (done) ->
-          sql = "delete from #{self.settings.table} where container = $1 and filename = $2"
-          self.db.query sql, [container, filename], done
+          sql = "delete from #{self.settings.table} where id = $1"
+          self.db.query sql, [id], done
       ], (err, res) ->
         if err
           self.db.query 'ROLLBACK TRANSACTION', ->
@@ -131,6 +137,15 @@ class PostgresStorage
         else
           self.db.query 'COMMIT TRANSACTION', (err) ->
             return callback err, res
+
+  getFileById: (id, callback) ->
+    @db.query "select * from #{@settings.table} where id = $1", [id], (err, res) ->
+      return callback err if err
+      if not res or not res.rows or res.rows.length is 0
+        err = new Error 'File not found'
+        err.status = 404
+        return callback err
+      callback null, res.rows[0]
 
   getFile: (container, filename, callback) ->
     @db.query "select * from #{@settings.table} where container = $1 and filename = $2"
@@ -143,21 +158,32 @@ class PostgresStorage
         return callback err
       callback null, res.rows[0]
 
+  _stream: (file, res, callback) ->
+    # TODO parametrize bufferSize
+    bufferSize = 16384
+    man = new LargeObjectManager @db
+    man.openAndReadableStream file.objectid, bufferSize, (err, size, stream) ->
+      return callback err if err
+      res.set 'Content-Disposition', "attachment; filename=\"#{file.filename}\""
+      res.set 'Content-Type', file.mimetype
+      res.set 'Content-Length', size
+      stream.pipe res
+
+  downloadById: (id, res, callback = (-> return)) ->
+    self = @
+    self.db.query 'BEGIN TRANSACTION', (err) ->
+      return callback err if err
+      self.getFileById id, (err, file) ->
+        return callback err if err
+        self._stream file, res, callback
+
   download: (container, filename, res, callback = (-> return)) ->
     self = @
     self.db.query 'BEGIN TRANSACTION', (err) ->
       return callback err if err
       self.getFile container, filename, (err, file) ->
         return callback err if err
-        # TODO parametrize bufferSize
-        bufferSize = 16384
-        man = new LargeObjectManager self.db
-        man.openAndReadableStream file.objectid, bufferSize, (err, size, stream) ->
-          return callback err if err
-          res.set 'Content-Disposition', "attachment; filename=\"#{file.filename}\""
-          res.set 'Content-Type', file.mimetype
-          res.set 'Content-Length', size
-          stream.pipe res
+        self._stream file, res, callback
 
 PostgresStorage.modelName = 'storage'
 
