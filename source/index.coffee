@@ -111,7 +111,7 @@ class PostgresStorage
 
   getFiles: (container, callback) ->
     @db.query "select * from #{@settings.table} where container = $1", [container], callback
-  
+
   removeFile: (container, filename, callback) ->
     self = @
     self.getFile container, filename, (err, file) ->
@@ -246,6 +246,7 @@ exports.initialize = (dataSource, callback) ->
   settings = dataSource.settings or {}
   connector = new PostgresStorage settings
   dataSource.connector = connector
+  dataSource.connector.pg = pg
   dataSource.connector.dataSource = dataSource
   connector.DataAccessObject = -> return
   for m, method of PostgresStorage.prototype
