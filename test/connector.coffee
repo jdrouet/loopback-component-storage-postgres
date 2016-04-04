@@ -46,11 +46,14 @@ describe 'postgres connector', ->
       before (done) ->
         datasource = loopback.createDataSource config
         setTimeout done, 200
-      
+
       it 'should create the datasource', ->
         expect(datasource).to.exist
         expect(datasource.connector).to.exist
         expect(datasource.settings).to.exist
+
+      it 'should expose pg instance', ->
+        expect(datasource.connector.pg).to.exist
 
       it 'should create the url', ->
         expect(datasource.settings.url).to.exist
@@ -96,7 +99,7 @@ describe 'postgres connector', ->
     app     = null
     ds      = null
     server  = null
-    
+
     before (done) ->
       app = loopback()
       app.set 'port', 5000
@@ -217,7 +220,7 @@ describe 'postgres connector', ->
           done()
 
     describe 'download', ->
-   
+
       beforeEach (done) ->
         insertTestFile ds, done
 
@@ -229,7 +232,7 @@ describe 'postgres connector', ->
           done()
 
     describe 'removeFile', ->
-   
+
       beforeEach (done) ->
         insertTestFile ds, done
 
